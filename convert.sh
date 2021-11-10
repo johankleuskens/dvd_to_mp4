@@ -1,4 +1,7 @@
 # (C) Johan Kleuskens, aug 2021
+#
+# https://gist.github.com/atais/552ee207a673901eddfc199fe79a4a40
+#
 pushd /mnt/hgfs
 find * -prune -type d | while IFS= read -r d; 
 do
@@ -12,7 +15,7 @@ do
 	then
 		echo "Found VIDEO_TS directory"
 		pushd VIDEO_TS
-		echo "Converting from DVD to mp4 in directory $d"		
+		echo "Converting from DVD to mp4 in directory $d"	
 		popd
 	elif [[ "$files" == "" ]]
 	then
