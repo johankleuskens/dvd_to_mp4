@@ -12,41 +12,51 @@ OP="$OP -b 2000"
 OUTPUT_DIR="/mnt/hgfs/SGM_mp4"
 
 pushd /mnt/hgfs
-find * -prune -type d | while IFS= read -r d; 
+for d in *;
 do
-	echo Stepping into "$d/"
-	pushd "$d/"
-	# Check if directory contains VIDEO_TS directory
-	subdirs=`find * -prune -type d`
-	files=`find . -name "*"`
-	echo $files
-	if [[ "$subdirs" == *"VIDEO_TS"* ]]
-	then
-		echo "Found VIDEO_TS directory"
-		echo "Converting from DVD to mp4 in directory $d"	
-		HandBrakeCLI -i "VIDEO_TS" --main-feature -o "$OUTPUT_DIR/$d.mp4" "$OP"
-		popd
-	elif [[ "$files" == "" ]]
-	then
-		echo "Skipping $d because this directory is empty"
-		popd
-	elif [[ "$files" == *".mp4"* ]]
-	then
-		echo "Skipping $d because this directory already contains an mp4 file"
-		popd
-	elif [[ "$files" == *".VOB"* ]]
-	then
-		echo "Converting from DVD to mp4 in directory $d"
-		popd
+    if [ -d "$d" ];
+    then
+		echo Stepping into "$d/"
+		pushd "$d/"
+		# Check if directory contains VIDEO_TS directory
+		subdirs=`find * -prune -type d`
+		files=`find . -name "*"`
+		echo $files
+		# Create the destination directory
 		mkdir "$OUTPUT_DIR/$d"
-		# If the directoty already contains an mp4, skip this conversion
-		mp4files=`find "$OUTPUT_DIR/$d" -name "*.mp4"`
-		if [[ -z "$mp4files" ]]
+		
+		if [[ "$subdirs" == *"VIDEO_TS"* ]];
 		then
-			HandBrakeCLI -i "$d" -o "$OUTPUT_DIR/$d/$d.mp4" --main-feature -e x264 -q 20 "$OP"
+			echo "Found VIDEO_TS directory"
+			echo "Converting from DVD to mp4 in directory $d"	
+			# If the directoty already contains an mp4, skip this conversion
+			mp4files=`find "$OUTPUT_DIR/$d" -name "*.mp4"`
+			if [[ -z "$mp4files" ]];
+			then
+				HandBrakeCLI -i "VIDEO_TS" --main-feature -o "$OUTPUT_DIR/$d/$d.mp4" "$OP" -e x264 -q 20 --stop-at duration:30
+			fi
+			popd
+		elif [[ "$files" == "" ]];
+		then
+			echo "Skipping $d because this directory is empty"
+			popd
+		elif [[ "$files" == *".mp4"* ]];
+		then
+			echo "Skipping $d because this directory already contains an mp4 file"
+			popd
+		elif [[ "$files" == *".VOB"* ]];
+		then
+			echo "Converting from DVD to mp4 in directory $d"
+			popd
+			# If the directoty already contains an mp4, skip this conversion
+			mp4files=`find "$OUTPUT_DIR/$d" -name "*.mp4"`
+			if [[ -z "$mp4files" ]];
+			then
+				HandBrakeCLI -i "$d" -o "$OUTPUT_DIR/$d/$d.mp4" --main-feature -e x264 -q 20 "$OP" --stop-at duration:30
+			fi
+		else
+			popd
 		fi
-	else
-		popd
 	fi
 done
 popd
