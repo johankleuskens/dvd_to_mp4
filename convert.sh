@@ -39,7 +39,12 @@ do
 		echo "Converting from DVD to mp4 in directory $d"
 		popd
 		mkdir "$OUTPUT_DIR/$d"
-		HandBrakeCLI -i "$d" -o "$OUTPUT_DIR/$d/$d.mp4" --main-feature -e x264 -q 20 "$OP"
+		# If the directoty already contains an mp4, skip this conversion
+		mp4files=`find "$OUTPUT_DIR/$d" -name "*.mp4"`
+		if [[ -z "$mp4files" ]]
+		then
+			HandBrakeCLI -i "$d" -o "$OUTPUT_DIR/$d/$d.mp4" --main-feature -e x264 -q 20 "$OP"
+		fi
 	else
 		popd
 	fi
