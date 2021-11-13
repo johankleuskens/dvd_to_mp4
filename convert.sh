@@ -1,8 +1,6 @@
-# (C) Johan Kleuskens, aug 2021
+# (C) Johan Kleuskens, aug-nov 2021
 #
-# https://gist.github.com/atais/552ee207a673901eddfc199fe79a4a40
-# HandBrakeCLI -i '0002_DVD 02_8mm'/ -o test.mp4   --main-feature -e x264 -q 20 --keep-display-aspect --loose-anamorphic --encoder-preset slow -b 2000
-#
+
 
 OP=" --keep-display-aspect"
 OP="$OP --loose-anamorphic"
@@ -10,26 +8,27 @@ OP="$OP --encoder-preset slow"
 OP="$OP -b 2000"
 OP="$OP --stop-at duration:30"
 
-OUTPUT_DIR="/mnt/hgfs/SGM_mp4"
+OUTPUT_DIR_NAME="SGM_mp4"
+OUTPUT_DIR="/mnt/hgfs/$OUTPUT_DIR_NAME"
 
 pushd /mnt/hgfs
 for d in *;
 do
-    if [ -d "$d" ];
+    if [[ -d "$d" && ! "$d" == "$OUTPUT_DIR_NAME" ]];
     then
 		echo Checking directory "$d/"
 		# check for files in the directory
 		files=`find "$d" -name "*"`
 		echo $files
 		# Create the destination directory
-		mkdir "$OUTPUT_DIR/$d"
+		mkdir -p "$OUTPUT_DIR/$d"
 
 		# If destination directory already contains an mp4, skip this conversion
 		mp4files=`find "$OUTPUT_DIR/$d" -name "*.mp4"`
 		if [[ -z "$mp4files" ]];
 		then	
 			# Check if directory contains VIDEO_TS directory
-			subdirs=`find "$d" -name -type d`
+			subdirs=`find "$d" -maxdepth 1 -type d `
 			if [[ "$subdirs" == *"VIDEO_TS"* ]];
 			then
 				echo "Found VIDEO_TS directory"
