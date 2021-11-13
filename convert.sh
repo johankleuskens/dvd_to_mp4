@@ -11,6 +11,9 @@ OP="$OP --stop-at duration:30"
 OUTPUT_DIR_NAME="SGM_mp4"
 OUTPUT_DIR="/mnt/hgfs/$OUTPUT_DIR_NAME"
 
+SAVEIFS=$IFS		# Store seperator
+IFS=$'\n'			# Make CR seperator
+
 pushd /mnt/hgfs
 for d in *;
 do
@@ -18,7 +21,7 @@ do
     then
 		echo Checking directory "$d/"
 		# check for files in the directory
-		files=`find "$d" -type f -name "*"`
+		files=`find "$d" -maxdepth 1 -type f -name "*"`
 		echo $files
 		# Create the destination directory
 		mkdir -p "$OUTPUT_DIR/$d"
@@ -34,46 +37,42 @@ do
 				echo "Found VIDEO_TS directory"
 				echo "Converting from VIDEO_TS to mp4 in directory $d"	
 				HandBrakeCLI -i "$d/VIDEO_TS" --main-feature -o "$OUTPUT_DIR/$d/$d.mp4"  -e x264 -q 20 $OP
+				
 			# Check if directory is empty
 			elif [[ "$files" == "" ]];
 			then
 				echo "Skipping $d because this directory is empty"
-			# Check if directory contains avi files
-			elif [[ "$files" == *".avi"* ]];
-			then
-				for f in "$files";
-				do
-					if [[ -f "$f" ]];
-					then
-						echo "Converting $f from avi to mp4"
-						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$f.mp4" -e x264 -q 20 $OP				
-					fi
-				done
+				
 			# Check if directory contains mpg files
 			elif [[ "$files" == *".mpg"* ]];
 			then
-				echo Found MPG files "$files"
-				for f in "$files";
+				mpgfiles=`find "$d" -maxdepth 1 -type f -name "*.mpg"`
+				for f in $mpgfiles;
 				do
-					echo MPG Handling file "$f"
-					if [[ -f "$f" ]];
-					then
-						echo "Converting $f from mpg to mpg"
-						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$f.mp4" -e x264 -q 20 $OP					
-					fi
+					echo "Converting $f from mpg to mp4"
+					HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$f.mp4" -e x264 -q 20 $OP					
 				done
+				
+			# Check if directory contains avi files
+			elif [[ "$files" == *".avi"* ]];
+			then
+				avifiles=`find "$d" -maxdepth 1 -type f -name "*.avi"`
+				for f in $avifiles;
+				do
+					echo "Converting $f from avi to mp4"
+					HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$f.mp4" -e x264 -q 20 $OP				
+				done
+				
 			# Check if directory contains mp4 files
 			elif [[ "$files" == *".mp4"* ]];
 			then
-				for f in "$files";
+				mp4files=`find "$d" -maxdepth 1 -type f -name "*.mp4"`
+				for f in $mp4files;
 				do
-					if [[ -f "$f" ]];
-					then
-						echo "Copying  $f to $OUTPUT_DIR/$f"
-						cp "$f" "$OUTPUT_DIR/$f"
-					fi
+					echo "Copying  $f to $OUTPUT_DIR/$f"
+					cp "$f" "$OUTPUT_DIR/$f"
 				done
-						
+				
 			# Check if directory contains VOB files
 			elif [[ "$files" == *".VOB"* ]];
 			then
@@ -86,3 +85,5 @@ do
 	fi
 done
 popd
+
+IFS=$SAVEIFS		# Put back seperator
