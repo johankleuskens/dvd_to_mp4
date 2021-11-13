@@ -18,7 +18,7 @@ do
     then
 		echo Checking directory "$d/"
 		# check for files in the directory
-		files=`find "$d" -name "*"`
+		files=`find "$d" -type f -name "*"`
 		echo $files
 		# Create the destination directory
 		mkdir -p "$OUTPUT_DIR/$d"
@@ -32,8 +32,8 @@ do
 			if [[ "$subdirs" == *"VIDEO_TS"* ]];
 			then
 				echo "Found VIDEO_TS directory"
-				echo "Converting from DVD to mp4 in directory $d"	
-				HandBrakeCLI -i "$d/VIDEO_TS" --main-feature -o $OUTPUT_DIR/$d/$d.mp4  -e x264 -q 20 $OP
+				echo "Converting from VIDEO_TS to mp4 in directory $d"	
+				HandBrakeCLI -i "$d/VIDEO_TS" --main-feature -o "$OUTPUT_DIR/$d/$d.mp4"  -e x264 -q 20 $OP
 			# Check if directory is empty
 			elif [[ "$files" == "" ]];
 			then
@@ -46,18 +46,20 @@ do
 					if [[ -f "$f" ]];
 					then
 						echo "Converting $f from avi to mp4"
-						HandBrakeCLI -i "$d/$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP				
+						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$f.mp4" -e x264 -q 20 $OP				
 					fi
 				done
 			# Check if directory contains mpg files
 			elif [[ "$files" == *".mpg"* ]];
 			then
+				echo Found MPG files "$files"
 				for f in "$files";
 				do
+					echo MPG Handling file "$f"
 					if [[ -f "$f" ]];
 					then
-						echo "Converting $f from avi to mpg"
-						HandBrakeCLI -i "$d/$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP					
+						echo "Converting $f from mpg to mpg"
+						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$f.mp4" -e x264 -q 20 $OP					
 					fi
 				done
 			# Check if directory contains mp4 files
@@ -67,8 +69,8 @@ do
 				do
 					if [[ -f "$f" ]];
 					then
-						echo "Copying  $f to $OUTPUT_DIR/$d/$f"
-						cp "$d/$f" "$OUTPUT_DIR/$d/$f"
+						echo "Copying  $f to $OUTPUT_DIR/$f"
+						cp "$f" "$OUTPUT_DIR/$f"
 					fi
 				done
 						
