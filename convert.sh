@@ -17,70 +17,69 @@ for d in *;
 do
     if [ -d "$d" ];
     then
-		echo Stepping into "$d/"
-		pushd "$d/"
-		files=`find . -name "*"`
+		echo Checking directory "$d/"
+		# check for files in the directory
+		files=`find "$d" -name "*"`
 		echo $files
 		# Create the destination directory
 		mkdir "$OUTPUT_DIR/$d"
 
-		# If the directoty already contains an mp4, skip this conversion
+		# If destination directory already contains an mp4, skip this conversion
 		mp4files=`find "$OUTPUT_DIR/$d" -name "*.mp4"`
 		if [[ -z "$mp4files" ]];
 		then	
 			# Check if directory contains VIDEO_TS directory
-			subdirs=`find * -prune -type d`
+			subdirs=`find "$d" -name -type d`
 			if [[ "$subdirs" == *"VIDEO_TS"* ]];
 			then
 				echo "Found VIDEO_TS directory"
 				echo "Converting from DVD to mp4 in directory $d"	
-				# If the directoty already contains an mp4, skip this conversion
-				HandBrakeCLI -i "VIDEO_TS" --main-feature -o $OUTPUT_DIR/$d/$d.mp4  -e x264 -q 20 $OP
-				popd
+				HandBrakeCLI -i "$d/VIDEO_TS" --main-feature -o $OUTPUT_DIR/$d/$d.mp4  -e x264 -q 20 $OP
+			# Check if directory is empty
 			elif [[ "$files" == "" ]];
 			then
 				echo "Skipping $d because this directory is empty"
-				popd
+			# Check if directory contains avi files
 			elif [[ "$files" == *".avi"* ]];
 			then
-				for f in $files;
+				for f in "$files";
 				do
-					if [[ -f $f ]];
+					if [[ -f "$f" ]];
 					then
 						echo "Converting $f from avi to mp4"
-						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP				
+						HandBrakeCLI -i "$d/$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP				
 					fi
 				done
-				popd
+			# Check if directory contains mpg files
 			elif [[ "$files" == *".mpg"* ]];
 			then
-				for f in $files;
+				for f in "$files";
 				do
-					if [[ -f $f ]];
+					if [[ -f "$f" ]];
 					then
 						echo "Converting $f from avi to mpg"
-						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP					
+						HandBrakeCLI -i "$d/$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP					
 					fi
 				done
-				popd
+			# Check if directory contains mp4 files
 			elif [[ "$files" == *".mp4"* ]];
 			then
-				for f in $files;
+				for f in "$files";
 				do
-					if [[ -f $f ]];
+					if [[ -f "$f" ]];
 					then
 						echo "Copying  $f to $OUTPUT_DIR/$d/$f"
-						cp "$f" "$OUTPUT_DIR/$d/$f"
+						cp "$d/$f" "$OUTPUT_DIR/$d/$f"
 					fi
-				done		
-				popd
+				done
+						
+			# Check if directory contains VOB files
 			elif [[ "$files" == *".VOB"* ]];
 			then
 				echo "Converting from DVD to mp4 in directory $d"
-				popd
 				HandBrakeCLI -i "$d" -o "$OUTPUT_DIR/$d/$d.mp4" --main-feature -e x264 -q 20 $OP
 			else
-				popd
+				echo "Unknown content in directory $d"
 			fi
 		fi
 	fi
