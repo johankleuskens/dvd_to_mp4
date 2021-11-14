@@ -50,29 +50,15 @@ do
 			then
 				echo "Skipping $d because this directory is empty"
 				
-			# Check if directory contains mpg files
-			elif [[ "$files" == *".mpg"* ]];
+			# Check if directory contains valid video files
+			elif [[ "$files" == *".avi"* || "$files" == *".MOV"* || "$files" == *".mpg"* || "$files" == *".MOD"* ]];
 			then
 				pushd "$d"
 				for f in *;
 				do
-					if [[ "$f" == *".mpg"* ]];
+					if [[ "$f" == *".avi"* || "$f" == *".MOV"* || "$f" == *".mpg"* || "$f" == *".MOD"* ]];
 					then
-						echo "Converting $f from mpg to mp4"
-						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP
-					fi					
-				done
-				popd
-				
-			# Check if directory contains avi files
-			elif [[ "$files" == *".avi"* ]];
-			then
-				pushd "$d"
-				for f in *;
-				do
-					if [[ "$f" == *".avi"* ]];
-					then
-						echo "Converting $f from avi to mp4"
+						echo "Converting $f to mp4"
 						HandBrakeCLI -i "$f" -o "$OUTPUT_DIR/$d/$f.mp4" -e x264 -q 20 $OP
 					fi				
 				done
