@@ -6,13 +6,15 @@ OP=" --keep-display-aspect"
 OP="$OP --loose-anamorphic"
 OP="$OP --encoder-preset veryslow"
 OP="$OP -b 2000"
+OP="$OP -d"
+
 #OP="$OP --stop-at duration:30"
 #OP="$OP --title 0"				# Scan all titles only
 
 OUTPUT_DIR_NAME="SGM_mp4"
-OUTPUT_DIR="/home/johan/$OUTPUT_DIR_NAME"
+OUTPUT_DIR="/mnt/hgfs/$OUTPUT_DIR_NAME"
 
-INPUT_DIR="/media/johan/TOSHIBA EXT/FILMS-Geschiedenis-Melderslo"
+INPUT_DIR="/mnt/hgfs"
 
 #SAVEIFS=$IFS		# Store seperator
 #IFS=$'\n'			# Make CR seperator
