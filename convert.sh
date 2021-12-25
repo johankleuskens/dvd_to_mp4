@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # (C) Johan Kleuskens, aug-nov 2021
 #
 
@@ -12,9 +14,9 @@ OP="$OP -d"
 #OP="$OP --title 0"				# Scan all titles only
 
 OUTPUT_DIR_NAME="SGM_mp4"
-OUTPUT_DIR="/mnt/hgfs/$OUTPUT_DIR_NAME"
+OUTPUT_DIR="/home/johan/$OUTPUT_DIR_NAME"
 
-INPUT_DIR="/mnt/hgfs"
+INPUT_DIR="/media/johan/FILMS-Geschiedenis-Melderslo"
 
 #SAVEIFS=$IFS		# Store seperator
 #IFS=$'\n'			# Make CR seperator
